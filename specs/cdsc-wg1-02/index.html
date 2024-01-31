@@ -132,7 +132,354 @@
 
 <hr />
 
-<p><code class="language-plaintext highlighter-rouge">[No main draft available yet]</code> See <a href="#other-drafts">Other Drafts</a> section for in-progress and alternative drafts</p>
+<h1 id="cdsc-wg1-02---client-registration">CDSC-WG1-02 - Client Registration</h1>
+
+<h2 id="abstract-">Abstract <a id="abstract" href="#abstract" class="permalink">🔗</a></h2>
+
+<p>This specification defines how utilities and other central entities (“Servers”) may allow third parties (“Clients”) to register, configure, and maintain connectivity with the utility or other central entity. This specification mostly extends various OAuth specifications (<a href="https://www.rfc-editor.org/rfc/rfc7591">Dynamic Client Registration</a>, <a href="https://www.rfc-editor.org/rfc/rfc8414">Authorization Server Metadata</a>, and more) to create a robust framework for offering secure, streamlined, and standardized connectivity between utilities and third parties.</p>
+
+<h2 id="status-">Status <a id="status" href="#status" class="permalink">🔗</a></h2>
+
+<p><b style="color:red">WARNING: This specification is a DRAFT and has not achieved consensus by the working group.</b></p>
+
+<h2 id="copyright-">Copyright <a id="copyright" href="#copyright" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="table-of-contents-">Table of Contents <a id="table-of-contents" href="#table-of-contents" class="permalink">🔗</a></h2>
+
+<ul>
+  <li><a href="#introduction">1. Introduction</a></li>
+  <li><a href="#terminology">2. Terminology</a></li>
+  <li><a href="#auth-server-metadata">3. Authorization Server Metadata</a>
+    <ul>
+      <li><a href="#auth-server-metadata-url">3.1. Metadata URL</a></li>
+      <li><a href="#auth-server-metadata-format">3.2. Metadata Object Format</a></li>
+      <li><a href="#scope-descriptions-format">3.3. Scope Descriptions Object Format</a></li>
+      <li><a href="#registration-field-format">3.4. Registration Field Object Format</a></li>
+      <li><a href="#registration-field-types">3.5. Registration Field Types</a></li>
+      <li><a href="#auth-details-fields-format">3.6. Authorization Details Field Object Format</a></li>
+      <li><a href="#auth-details-field-types">3.7. Authorization Details Field Types</a></li>
+    </ul>
+  </li>
+  <li><a href="#client-registration-process">4. Client Registration Process</a>
+    <ul>
+      <li><a href="#registration-request">4.1. Client Registration Request</a></li>
+      <li><a href="#registration-response">4.2. Client Registration Response</a></li>
+    </ul>
+  </li>
+  <li><a href="#clients-api">5. Clients API</a>
+    <ul>
+      <li><a href="#client-format">5.1. Client Object Format</a></li>
+      <li><a href="#clients-list">5.2. Listing Clients</a></li>
+      <li><a href="#clients-modify">5.3. Modifying Clients</a></li>
+    </ul>
+  </li>
+  <li><a href="#client-settings-api">6. Client Settings API</a>
+    <ul>
+      <li><a href="#client-settings-format">6.1. Client Settings Object Format</a></li>
+      <li><a href="#clients-settings-modify">6.2. Modifying Client Settings</a></li>
+    </ul>
+  </li>
+  <li><a href="#client-updates-api">7. Client Updates API</a>
+    <ul>
+      <li><a href="#client-update-format">7.1. Client Update Object Format</a></li>
+      <li><a href="#client-update-types">7.2. Client Update Types</a></li>
+      <li><a href="#client-update-statuses">7.3. Client Update Statuses</a></li>
+      <li><a href="#client-update-request-format">7.4. Client Update Request Object Format</a></li>
+      <li><a href="#clients-updates-list">7.5. Listing Client Updates</a></li>
+      <li><a href="#clients-updates-modify">7.6. Modifying Client Updates</a></li>
+    </ul>
+  </li>
+  <li><a href="#scope-creds-api">8. Scope Credentials API</a>
+    <ul>
+      <li><a href="#scope-creds-format">8.1. Scope Credentials Object Format</a></li>
+      <li><a href="#scope-creds-statuses">8.2. Scope Credentials Statuses</a></li>
+      <li><a href="#scope-creds-list">8.3. Listing Scope Credentials</a></li>
+      <li><a href="#scope-creds-create">8.4. Creating Scope Credentials</a></li>
+      <li><a href="#scope-creds-modify">8.5. Modifying Scope Credentials</a></li>
+      <li><a href="#scope-creds-delete">8.6. Deleting Scope Credentials</a></li>
+    </ul>
+  </li>
+  <li><a href="#grants-api">9. Grants API</a>
+    <ul>
+      <li><a href="#grant-format">9.1. Grant Object Format</a></li>
+      <li><a href="#grant-statuses">9.2. Grant Statuses</a></li>
+      <li><a href="#grants-list">9.3. Listing Grants</a></li>
+      <li><a href="#grants-modify">9.4. Modifying Grants</a></li>
+    </ul>
+  </li>
+  <li><a href="#extensions">10. Extensions</a></li>
+  <li><a href="#examples">11. Examples</a></li>
+  <li><a href="#security">12. Security Considerations</a>
+    <ul>
+      <li><a href="#restricted-access">12.1. Restricted Access</a></li>
+      <li><a href="#rate-limiting">12.2. Rate Limiting</a></li>
+    </ul>
+  </li>
+  <li><a href="#references">13. References</a></li>
+  <li><a href="#acknowledgments">14. Acknowledgments</a></li>
+  <li><a href="#authors-addresses">15. Authors’ Addresses</a></li>
+</ul>
+
+<h2 id="1-introduction-">1. Introduction <a id="introduction" href="#introduction" class="permalink">🔗</a></h2>
+
+<p>This specification was developed as part of the global effort to combat the climate crisis. Specifically, in order to scalably measure carbon emissions of organizations and calculate the impact of deploying and operating clean energy technologies, companies need an efficient means to register and interact with energy utilities and other similar entities.</p>
+
+<p>There are thousands of utilities serving customers across the world, and each have their own way of providing access to privileged functionality and data. This specification defines a way for these utilities and other entities (“Servers”) to provide a standardized, structured process for external users and companies (“Clients”) to register and obtain secure access to privileged functionality and data. By offering a standardized Client registration and management protocol, utilities and other entities can enable secure interoperability with other external systems providing climate-change fighting services such as carbon tracking, decarbonization measures, grid flexibility capabilities, and energy benchmarking.</p>
+
+<p>This specification does NOT describe what specific privileged functionality or data is offered to Clients as part of their registration. Instead, relevant stakeholders are encouraged to write <a href="#extensions">Extensions</a> to this specification that enable various use cases that need access to privileged functionality or data. For example, this specification may be extended to define a method for Clients to be able to access customer-authorized energy usage data.</p>
+
+<h2 id="2-terminology-">2. Terminology <a id="terminology" href="#terminology" class="permalink">🔗</a></h2>
+
+<p><a id="server" href="#server" class="permalink">🔗</a> <strong>“Server”</strong> - The entity hosting the specified endpoints. A Server can be an energy utility or another type of entity that want to provide access to privileged functionality or data. These entities can include, but are not limited to, distribution utilities, grid operators, electric retailers, community choice aggregators, government agencies, data warehouses, and private infrastructure providers.</p>
+
+<p><a id="client" href="#client" class="permalink">🔗</a> <strong>“Client”</strong> - The entity requesting Server’s metadata endpoints. A Client can be any organization or user seeking to register with a Server for a specific scope of access. These entities can include, but are not limited to, carbon tracking applications, electric vehicle companies, clean energy technology providers, commercial utility customers, grid management applications, and energy efficiency organizations.</p>
+
+<p><a id="referenced-technologies" href="#referenced-technologies" class="permalink">🔗</a> Referenced Technologies: “<a href="https://www.rfc-editor.org/rfc/rfc9110#name-https-uri-scheme">HTTPS</a>”, “<a href="https://www.rfc-editor.org/rfc/rfc3986.html#section-1.1.3">URL</a>”, “<a href="https://www.rfc-editor.org/rfc/rfc9110#name-methods">Request Methods</a>”, “<a href="https://www.rfc-editor.org/rfc/rfc9110#name-status-codes">Status Codes</a>”, “<a href="https://www.rfc-editor.org/rfc/rfc8259">JSON</a>”, “<a href="https://oauth.net/specs/">OAuth</a>”, <span style="background-color:yellow">TODO: add more as needed</span> are defined by their referenced standards documents.</p>
+
+<p><a id="key-words" href="#key-words" class="permalink">🔗</a> Key Words: “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” are defined in accordance with <a href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>.</p>
+
+<h2 id="3-authorization-server-metadata-">3. Authorization Server Metadata <a id="auth-server-metadata" href="#auth-server-metadata" class="permalink">🔗</a></h2>
+
+<p>To enable automated Client registration, Servers MUST host an endpoint with structured metadata about how to submit a <a href="#registration-request">registration request</a>, as well as functionality and data capabilities offered by the Server. The requirements for hosting this metadata endpoint follows <a href="https://www.rfc-editor.org/rfc/rfc8414">OAuth 2.0 Authorization Server Metadata</a> with several additions for Carbon Data Specification (CDS) functionality described in the following sections.</p>
+
+<h3 id="31-metadata-url-">3.1. Metadata URL <a id="auth-server-metadata-url" href="#auth-server-metadata-url" class="permalink">🔗</a></h3>
+
+<p>Following OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-3">Obtaining Authorization Server Metadata</a> process, a Server’s Authorization Server Metadata Object is retrieved by making an HTTPS request to a specified URL.</p>
+
+<p>To ensure discoverability to the specified URL, this specification extends <a href="/specs/cdsc-wg1-01/#server-capabilities">CDSC-WG1-01 Server Capabilities</a> to require the following values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">oauth</code> - <em>string</em> - (REQUIRED) Including Client Registration via OAuth in the list of a Server’s available capabilities</li>
+</ul>
+
+<p>As well as extending the <a href="/specs/cdsc-wg1-01/#metadata-object-format">CDSC-WG1-01 Metadata Object Format</a> to require the following values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">oauth_metadata</code> - <em>URL</em> - (REQUIRED) Where Clients can obtain the Server’s Authorization Server Metadata Object</li>
+</ul>
+
+<p>In addition to requiring that the URL be included in the <a href="/specs/cdsc-wg1-01/#metadata-object-format">CDSC-WG1-01 Metadata Object Format</a>, Servers MAY also configure the URL such that it conforms to the default <a href="#https://www.rfc-editor.org/rfc/rfc8414#section-7.3">Well-Known URI</a> format, which can increase interoperability beyond the above specified CDSC-WG1-01 extension.</p>
+
+<h3 id="32-metadata-object-format-">3.2. Metadata Object Format <a id="auth-server-metadata-format" href="#auth-server-metadata-format" class="permalink">🔗</a></h3>
+
+<p>A Server’s Authorization Server Metadata Object follows OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Authorization Server Metadata</a> object format with the following modifications from OPTIONAL or RECOMMENDED to REQUIRED:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">registration_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591">Dynamic Client Registration</a> functionality is required to enable the <a href="#client-registration-process">Client Registration Process</a></li>
+  <li><code class="language-plaintext highlighter-rouge">scopes_supported</code> -  <em>Array[string]</em> - (REQUIRED) Disclosure of available scopes is required to enable integration capabilities into other platforms</li>
+  <li><code class="language-plaintext highlighter-rouge">service_documentation</code> - <em>URL</em> - (REQUIRED) Developer documentation is required by the Server to help streamline Client integration</li>
+  <li><code class="language-plaintext highlighter-rouge">op_policy_uri</code> - <em>URL</em> - (REQUIRED) Policies for Clients registering is required</li>
+  <li><code class="language-plaintext highlighter-rouge">op_tos_uri</code> - <em>URL</em> - (REQUIRED) Terms of use for Clients registering is required</li>
+  <li><code class="language-plaintext highlighter-rouge">revocation_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7009">Token Revocation</a> functionality is required</li>
+  <li><code class="language-plaintext highlighter-rouge">introspection_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7662">Token Introspection</a> functionality is required</li>
+  <li><code class="language-plaintext highlighter-rouge">code_challenge_methods_supported</code> - <em>Array[string]</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7636">Proof Key for Code Exchange by OAuth Public Clients</a> functionality is required. Servers MUST offer <code class="language-plaintext highlighter-rouge">S256</code> and MUST NOT offer <code class="language-plaintext highlighter-rouge">plain</code> code verifier methods.</li>
+</ul>
+
+<p>In addition to the standard set of OAuth <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Authorization Server Metadata</a> values, this specification also requires the following OAuth extension capabilities to be included in the metadata object values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">authorization_details_types_supported</code> - <em>Array[string]</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9396">Rich Authorization Requests</a> functionality is required. This array of values MUST be the same as <code class="language-plaintext highlighter-rouge">scopes_supported</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">pushed_authorization_request_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9126">Pushed Authorization Requests</a> functionality is required</li>
+</ul>
+
+<p>In addition to OAuth capabilities included in the metadata object, this specification adds the following Carbon Data Specification (CDS) values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cds_oauth_version</code> - <em>string</em> - (REQUIRED) The version of the CDS-WG1-02 Client Registration specification that the Server has implemented, which for this version of the specification is <code class="language-plaintext highlighter-rouge">v1</code></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_human_registration</code> - <em>URL</em> - (REQUIRED) Where Clients who do not have the technical capacity to use the <code class="language-plaintext highlighter-rouge">registration_endpoint</code> can visit to manually register a Client using a web browser</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_client_directory</code> - <em>URL</em> - (REQUIRED) Where the Server hosts a webpage listing the Clients who have registered and been approved to be publicly listed as registered</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_test_accounts</code> - <em>URL</em> - (REQUIRED) Where Clients can find developer documentation on what test account credentials may be used for testing OAuth <code class="language-plaintext highlighter-rouge">response_type=code</code> authorization requests</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_clients_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#clients-api">Clients API</a></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_client_settings_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#client-settings-api">Client Settings API</a></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_client_updates_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#client-updates-api">Client Updates API</a></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_scope_credentials_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#scope-creds-api">Scope Credentials API</a></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_grants_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#grants-api">Grants API</a></li>
+  <li><code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> - <em>Hash[<a href="#scope-descriptions-format">ScopeDescription</a>]</em> - (REQUIRED) An object providing additional information about what Scope values listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> mean. This object MUST include a key for each Scope listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> with a <a href="#scope-descriptions-format">Scope Description</a> as that key’s value.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_registration_fields</code> - <em>Hash[<a href="#registration-field-format">RegistrationField</a>]</em> - (REQUIRED) An object providing additional information about Registration Field that are referenced in <a href="#scope-descriptions-format">Scope Description’s</a> <code class="language-plaintext highlighter-rouge">registration_requirements</code> list. This object MUST include a key for each Registration Field <code class="language-plaintext highlighter-rouge">id</code> included in the <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists in the metadata object with a <a href="#registration-field-format">Registration Field</a> as that key’s value. If all <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists are empty, this reference object is an empty object (<code class="language-plaintext highlighter-rouge">{}</code>).</li>
+</ul>
+
+<p>Other values in specifications for the Authorization Server Metadata specification or other extensions MAY be included as described in their respective specifications.</p>
+
+<h3 id="33-scope-descriptions-object-format-">3.3. Scope Descriptions Object Format <a id="scope-descriptions-format" href="#scope-descriptions-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="34-registration-field-object-format-">3.4. Registration Field Object Format <a id="registration-field-format" href="#registration-field-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="35-registration-field-types-">3.5. Registration Field Types <a id="registration-field-types" href="#registration-field-types" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="36-authorization-details-field-object-format-">3.6. Authorization Details Field Object Format <a id="auth-details-fields-format" href="#auth-details-fields-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="37-authorization-details-field-types-">3.7. Authorization Details Field Types <a id="auth-details-field-types" href="#auth-details-field-types" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="4-client-registration-process-">4. Client Registration Process <a id="client-registration-process" href="#client-registration-process" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="41-client-registration-request-">4.1. Client Registration Request <a id="registration-request" href="#registration-request" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="42-client-registration-response-">4.2. Client Registration Response <a id="registration-response" href="#registration-response" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="5-clients-api-">5. Clients API <a id="clients-api" href="#clients-api" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="51-client-object-format-">5.1. Client Object Format <a id="client-format" href="#client-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="52-listing-clients-">5.2. Listing Clients <a id="clients-list" href="#clients-list" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="53-modifying-clients-">5.3. Modifying Clients <a id="clients-modify" href="#clients-modify" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="6-client-settings-api-">6. Client Settings API <a id="client-settings-api" href="#client-settings-api" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="61-client-settings-object-format-">6.1. Client Settings Object Format <a id="client-settings-format" href="#client-settings-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="62-modifying-client-settings-">6.2. Modifying Client Settings <a id="clients-settings-modify" href="#clients-settings-modify" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="7-client-updates-api-">7. Client Updates API <a id="client-updates-api" href="#client-updates-api" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="71-client-update-object-format-">7.1. Client Update Object Format <a id="client-update-format" href="#client-update-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="72-client-update-types-">7.2. Client Update Types <a id="client-update-types" href="#client-update-types" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="73-client-update-statuses-">7.3. Client Update Statuses <a id="client-update-statuses" href="#client-update-statuses" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="74-client-update-request-object-format-">7.4. Client Update Request Object Format <a id="client-update-request-format" href="#client-update-request-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="75-listing-client-updates-">7.5. Listing Client Updates <a id="clients-updates-list" href="#clients-updates-list" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="76-modifying-client-updates-">7.6. Modifying Client Updates <a id="clients-updates-modify" href="#clients-updates-modify" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="8-scope-credentials-api-">8. Scope Credentials API <a id="scope-creds-api" href="#scope-creds-api" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="81-scope-credentials-object-format-">8.1. Scope Credentials Object Format <a id="scope-creds-format" href="#scope-creds-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="82-scope-credentials-statuses-">8.2. Scope Credentials Statuses <a id="scope-creds-statuses" href="#scope-creds-statuses" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="83-listing-scope-credentials-">8.3. Listing Scope Credentials <a id="scope-creds-list" href="#scope-creds-list" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="84-creating-scope-credentials-">8.4. Creating Scope Credentials <a id="scope-creds-create" href="#scope-creds-create" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="85-modifying-scope-credentials-">8.5. Modifying Scope Credentials <a id="scope-creds-modify" href="#scope-creds-modify" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="86-deleting-scope-credentials-">8.6. Deleting Scope Credentials <a id="scope-creds-delete" href="#scope-creds-delete" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="9-grants-api-">9. Grants API <a id="grants-api" href="#grants-api" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="91-grant-object-format-">9.1. Grant Object Format <a id="grant-format" href="#grant-format" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="92-grant-statuses-">9.2. Grant Statuses <a id="grant-statuses" href="#grant-statuses" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="93-listing-grants-">9.3. Listing Grants <a id="grants-list" href="#grants-list" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h3 id="94-modifying-grants-">9.4. Modifying Grants <a id="grants-modify" href="#grants-modify" class="permalink">🔗</a></h3>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="10-extensions-">10. Extensions <a id="extensions" href="#extensions" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="11-examples-">11. Examples <a id="examples" href="#examples" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="12-security-considerations-">12. Security Considerations <a id="security" href="#security" class="permalink">🔗</a></h2>
+
+<p>This specification describes a protocol by which a utility or other entity (a Server) can allow third parties (Clients) to register and obtain privileged access to the Server’s offered capabilities and data. Because the functionality described in this specification enables access to private Server functionality and data, Servers MUST follow industry cybersecurity best practices when securing their implementations of this specification to prevent unintended or inadvertent access to privileged functionality or data to Clients who are not authorized. These best practices include requiring HTTPS for API endpoints using the latest widely adopted encryption standards, undergoing regular security audits and penetration tests, and internally requiring security-focused process controls and data handling procedures.</p>
+
+<h3 id="121-restricted-access-">12.1. Restricted Access <a id="restricted-access" href="#restricted-access" class="permalink">🔗</a></h3>
+
+<p>For unauthenticated endpoints (<a href="#auth-server-metadata">Authorization Server Metadata</a>, <a href="#client-registration-process">Client Registration Process</a>), while Servers can add <a href="#rate-limiting">rate limiting</a> configurations to protect their systems from being overwhelmed with requests, Servers MUST NOT add anti-bot blocking measures (e.g. captchas) that prevent automated requests from other systems. The functionality described in this specification is intended to be able to be integrated in other platforms to allow those platforms to automate interactions with Servers on their users’ behalf.</p>
+
+<p>If <a href="#auth-server-metadata">Authorization Server Metadata</a> is referenced in a public <a href="/specs/cdsc-wg1-01/#metadata-endpoint">CDSC-WG1-01 Server Metadata endpoint</a>, then the <a href="#auth-server-metadata">Authorization Server Metadata</a> and <a href="#client-registration-process">Client Registration Process</a> must also be public.</p>
+
+<p>Servers that wish to restrict access of by-default unauthenticated endpoints to certain Clients MUST configure well established authentication processes for Clients to ensure that only the approved Clients may access the restricted endpoint. This specification does not describe specifically how Servers will authenticate Clients for by-default unauthenticated endpoints, as these restricted access protocols are context dependent. For example, if a Server providing a private Client Registration endpoint as part of an existing logged in portal, then they can use that logged in portal’s session cookie to authenticate Client requests to the registration endpoint.</p>
+
+<p>For authenticated endpoints (<a href="#clients-api">Clients API</a>, <a href="#client-settings-api">Client Settings API</a>, <a href="#client-updates-api">Client Updates API</a>, <a href="#scope-creds-api">Scope Credentials API</a>, <a href="#grants-api">Grants API</a>), Servers MUST authenticate requests using OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc6750#section-2.1">Authorization Request Header Field</a> with access tokens obtained using the OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc6749#section-5">Issuing an Access Token</a> process.</p>
+
+<h3 id="122-rate-limiting-">12.2. Rate Limiting <a id="rate-limiting" href="#rate-limiting" class="permalink">🔗</a></h3>
+
+<p>For unauthenticated endpoints (<a href="#auth-server-metadata">Authorization Server Metadata</a>, <a href="#client-registration-process">Client Registration Process</a>), Servers SHOULD configure rate limiting restrictions so that bots and misconfigured scripts will not flood and overwhelm the endpoints with requests, while still allowing legitimate and low-volume automated requests have access to the endpoints.</p>
+
+<p>For authenticated endpoints (<a href="#clients-api">Clients API</a>, <a href="#client-settings-api">Client Settings API</a>, <a href="#client-updates-api">Client Updates API</a>, <a href="#scope-creds-api">Scope Credentials API</a>, <a href="#grants-api">Grants API</a>), Servers SHOULD configure rate limiting by Client and Scope Credential to ensure that individual Clients do not overwhelm Servers with authenticated API requests. Additionally, Servers SHOULD configure rate limiting for unauthenticated or failed authentication requests to authenticated API endpoints to prevent brute force attempts to gain access to authenticated APIs.</p>
+
+<h2 id="13-references-">13. References <a id="references" href="#references" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="14-acknowledgments-">14. Acknowledgments <a id="acknowledgments" href="#acknowledgments" class="permalink">🔗</a></h2>
+
+<p>The authors would like to thank the late Shuli Goodman, who was the Executive Director of LFEnergy, for her incredible leadership in initially organizing the Carbon Data Specification.</p>
+
+<h2 id="15-authors-addresses-">15. Authors’ Addresses <a id="authors-addresses" href="#authors-addresses" class="permalink">🔗</a></h2>
+
+<p>Daniel Roesler<br />
+UtilityAPI<br />
+Email: <a href="mailto:daniel@utilityapi.com">daniel@utilityapi.com</a><br />
+URI: <a href="https://utilityapi.com/">https://utilityapi.com/</a></p>
 
 <hr />
 

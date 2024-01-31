@@ -132,7 +132,79 @@
 
 <hr />
 
-<p><code class="language-plaintext highlighter-rouge">[No main draft available yet]</code> See <a href="#other-drafts">Other Drafts</a> section for in-progress and alternative drafts</p>
+<h1 id="cdsc-wg1-03---customer-data">CDSC-WG1-03 - Customer Data</h1>
+
+<h2 id="abstract-">Abstract <a id="abstract" href="#abstract" class="permalink">🔗</a></h2>
+
+<p>This specification defines how utilities and other central entities (“Servers”) may allow third parties (“Clients”) to access utility account holder data (“Customer Data”), including for uses cases that require account holders to authorize the access. This specification extends CDSC-WG1-02 (<a href="/specs/cdsc-wg1-02">Client Registration</a>) to add OAuth authorization scopes for Customer Data, as well as defining the APIs used to access Customer Data when authorization is granted.</p>
+
+<h2 id="status-">Status <a id="status" href="#status" class="permalink">🔗</a></h2>
+
+<p><b style="color:red">WARNING: This specification is a DRAFT and has not achieved consensus by the working group.</b></p>
+
+<h2 id="copyright-">Copyright <a id="copyright" href="#copyright" class="permalink">🔗</a></h2>
+
+<p><span style="background-color:yellow">TODO</span></p>
+
+<h2 id="table-of-contents-">Table of Contents <a id="table-of-contents" href="#table-of-contents" class="permalink">🔗</a></h2>
+
+<ul>
+  <li><a href="#introduction">1. Introduction</a></li>
+  <li><a href="#terminology">2. Terminology</a></li>
+  <li><a href="#authorization">3. Authorization</a>
+    <ul>
+      <li><a href="#authorization-scopes">3.1. Authorization Scopes</a></li>
+      <li><a href="#authorization-requirements">3.2. Defining Requirements for Scope Registration</a></li>
+      <li><a href="#client-metadata">3.3. Client Metadata</a></li>
+    </ul>
+  </li>
+  <li><a href="#account-api">4. Account API</a>
+    <ul>
+      <li><a href="#account-format">4.1. Account Object Format</a></li>
+      <li><a href="#accounts-list">4.2. Listing Accounts</a></li>
+    </ul>
+  </li>
+  <li><a href="#servicecontract-api">5. ServiceContract API</a>
+    <ul>
+      <li><a href="#servicecontract-format">5.1. ServiceContract Object Format</a></li>
+      <li><a href="#servicecontract-list">5.2. Listing ServiceContracts</a></li>
+    </ul>
+  </li>
+  <li><a href="#servicepoint-api">6. ServicePoint API</a>
+    <ul>
+      <li><a href="#servicepoint-format">6.1. ServicePoint Object Format</a></li>
+      <li><a href="#servicepoint-list">6.2. Listing ServicePoints</a></li>
+    </ul>
+  </li>
+  <li><a href="#billstatement-api">7. BillStatement API</a>
+    <ul>
+      <li><a href="#billstatement-format">7.1. BillStatement Object Format</a></li>
+      <li><a href="#billstatement-list">7.2. Listing BillStatements</a></li>
+    </ul>
+  </li>
+  <li><a href="#billsection-api">8. BillSection API</a>
+    <ul>
+      <li><a href="#billsection-format">8.1. BillSection Object Format</a></li>
+      <li><a href="#billsection-list">8.2. Listing BillSections</a></li>
+    </ul>
+  </li>
+  <li><a href="#usage-api">9. Usage API</a>
+    <ul>
+      <li><a href="#usage-format">9.1. Usage Object Format</a></li>
+      <li><a href="#usage-list">9.2. Listing Usage</a></li>
+    </ul>
+  </li>
+  <li><a href="#extensions">10. Extensions</a></li>
+  <li><a href="#examples">11. Examples</a></li>
+  <li><a href="#security">12. Security Considerations</a>
+    <ul>
+      <li><a href="#rate-limiting">12.1. Rate Limiting</a></li>
+    </ul>
+  </li>
+  <li><a href="#references">13. References</a></li>
+  <li><a href="#acknowledgments">14. Acknowledgments</a></li>
+  <li><a href="#authors-addresses">15. Authors’ Addresses</a></li>
+</ul>
 
 <hr />
 
