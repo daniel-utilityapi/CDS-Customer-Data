@@ -158,8 +158,9 @@
       <li><a href="#scope-descriptions-format">3.3. Scope Descriptions Object Format</a></li>
       <li><a href="#registration-field-format">3.4. Registration Field Object Format</a></li>
       <li><a href="#registration-field-types">3.5. Registration Field Types</a></li>
-      <li><a href="#auth-details-fields-format">3.6. Authorization Details Field Object Format</a></li>
-      <li><a href="#auth-details-field-types">3.7. Authorization Details Field Types</a></li>
+      <li><a href="#registration-field-formats">3.6. Registration Field Formats</a></li>
+      <li><a href="#auth-details-fields-format">3.7. Authorization Details Field Object Format</a></li>
+      <li><a href="#auth-details-field-formats">3.8. Authorization Details Field Formats</a></li>
     </ul>
   </li>
   <li><a href="#client-registration-process">4. Client Registration Process</a>
@@ -267,13 +268,13 @@
 <p>A Server’s Authorization Server Metadata Object follows OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Authorization Server Metadata</a> object format with the following modifications from OPTIONAL or RECOMMENDED to REQUIRED:</p>
 
 <ul>
-  <li><code class="language-plaintext highlighter-rouge">registration_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591">Dynamic Client Registration</a> functionality is required to enable the <a href="#client-registration-process">Client Registration Process</a></li>
-  <li><code class="language-plaintext highlighter-rouge">scopes_supported</code> -  <em>Array[string]</em> - (REQUIRED) Disclosure of available scopes is required to enable integration capabilities into other platforms</li>
-  <li><code class="language-plaintext highlighter-rouge">service_documentation</code> - <em>URL</em> - (REQUIRED) Developer documentation is required by the Server to help streamline Client integration</li>
-  <li><code class="language-plaintext highlighter-rouge">op_policy_uri</code> - <em>URL</em> - (REQUIRED) Policies for Clients registering is required</li>
-  <li><code class="language-plaintext highlighter-rouge">op_tos_uri</code> - <em>URL</em> - (REQUIRED) Terms of use for Clients registering is required</li>
-  <li><code class="language-plaintext highlighter-rouge">revocation_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7009">Token Revocation</a> functionality is required</li>
-  <li><code class="language-plaintext highlighter-rouge">introspection_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7662">Token Introspection</a> functionality is required</li>
+  <li><code class="language-plaintext highlighter-rouge">registration_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591">Dynamic Client Registration</a> functionality is required to enable the <a href="#client-registration-process">Client Registration Process</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">scopes_supported</code> -  <em>Array[string]</em> - (REQUIRED) Disclosure of available scopes is required to enable integration capabilities into other platforms. This array MUST contain the <code class="language-plaintext highlighter-rouge">client_admin</code> scope.</li>
+  <li><code class="language-plaintext highlighter-rouge">service_documentation</code> - <em>URL</em> - (REQUIRED) Developer documentation is required by the Server to help streamline Client integration.</li>
+  <li><code class="language-plaintext highlighter-rouge">op_policy_uri</code> - <em>URL</em> - (REQUIRED) Policies for Clients registering is required.</li>
+  <li><code class="language-plaintext highlighter-rouge">op_tos_uri</code> - <em>URL</em> - (REQUIRED) Terms of use for Clients registering is required.</li>
+  <li><code class="language-plaintext highlighter-rouge">revocation_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7009">Token Revocation</a> functionality is required.</li>
+  <li><code class="language-plaintext highlighter-rouge">introspection_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7662">Token Introspection</a> functionality is required.</li>
   <li><code class="language-plaintext highlighter-rouge">code_challenge_methods_supported</code> - <em>Array[string]</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7636">Proof Key for Code Exchange by OAuth Public Clients</a> functionality is required. Servers MUST offer <code class="language-plaintext highlighter-rouge">S256</code> and MUST NOT offer <code class="language-plaintext highlighter-rouge">plain</code> code verifier methods.</li>
 </ul>
 
@@ -281,7 +282,15 @@
 
 <ul>
   <li><code class="language-plaintext highlighter-rouge">authorization_details_types_supported</code> - <em>Array[string]</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9396">Rich Authorization Requests</a> functionality is required. This array of values MUST be the same as <code class="language-plaintext highlighter-rouge">scopes_supported</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">pushed_authorization_request_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9126">Pushed Authorization Requests</a> functionality is required</li>
+  <li><code class="language-plaintext highlighter-rouge">pushed_authorization_request_endpoint</code> - <em>URL</em> - (REQUIRED) OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9126">Pushed Authorization Requests</a> functionality is required.</li>
+</ul>
+
+<p>In addition to the above additionally required set of OAuth <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Authorization Server Metadata</a> values, this specification clarifies use of the following OAuth sandard values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">response_types_supported</code> - <em>Array[string]</em> - (REQUIRED) The response types in this array MUST represent a union of all <code class="language-plaintext highlighter-rouge">response_types_supported</code> values contained in the <code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> object.</li>
+  <li><code class="language-plaintext highlighter-rouge">grant_types_supported</code> - <em>Array[string]</em> - (REQUIRED) The response types in this array MUST represent a union of all <code class="language-plaintext highlighter-rouge">grant_types_supported</code> values contained in the <code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> object.</li>
+  <li><code class="language-plaintext highlighter-rouge">token_endpoint_auth_methods_supported</code> - <em>Array[string]</em> - (REQUIRED) The response types in this array MUST represent a union of all <code class="language-plaintext highlighter-rouge">token_endpoint_auth_methods_supported</code> values contained in the <code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> object.</li>
 </ul>
 
 <p>In addition to OAuth capabilities included in the metadata object, this specification adds the following Carbon Data Specification (CDS) values:</p>
@@ -296,43 +305,140 @@
   <li><code class="language-plaintext highlighter-rouge">cds_client_updates_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#client-updates-api">Client Updates API</a></li>
   <li><code class="language-plaintext highlighter-rouge">cds_scope_credentials_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#scope-creds-api">Scope Credentials API</a></li>
   <li><code class="language-plaintext highlighter-rouge">cds_grants_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#grants-api">Grants API</a></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> - <em>Hash[<a href="#scope-descriptions-format">ScopeDescription</a>]</em> - (REQUIRED) An object providing additional information about what Scope values listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> mean. This object MUST include a key for each Scope listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> with a <a href="#scope-descriptions-format">Scope Description</a> as that key’s value.</li>
-  <li><code class="language-plaintext highlighter-rouge">cds_registration_fields</code> - <em>Hash[<a href="#registration-field-format">RegistrationField</a>]</em> - (REQUIRED) An object providing additional information about Registration Field that are referenced in <a href="#scope-descriptions-format">Scope Description’s</a> <code class="language-plaintext highlighter-rouge">registration_requirements</code> list. This object MUST include a key for each Registration Field <code class="language-plaintext highlighter-rouge">id</code> included in the <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists in the metadata object with a <a href="#registration-field-format">Registration Field</a> as that key’s value. If all <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists are empty, this reference object is an empty object (<code class="language-plaintext highlighter-rouge">{}</code>).</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> - <em>Map[<a href="#scope-descriptions-format">ScopeDescription</a>]</em> - (REQUIRED) An object providing additional information about what Scope values listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> mean. This object MUST include a key for each Scope listed in <code class="language-plaintext highlighter-rouge">scopes_supported</code> with a <a href="#scope-descriptions-format">Scope Description</a> as that key’s value.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_registration_fields</code> - <em>Map[<a href="#registration-field-format">RegistrationField</a>]</em> - (REQUIRED) An object providing additional information about Registration Field that are referenced in <a href="#scope-descriptions-format">Scope Description’s</a> <code class="language-plaintext highlighter-rouge">registration_requirements</code> list. This object MUST include a key for each Registration Field <code class="language-plaintext highlighter-rouge">id</code> included in the <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists in the metadata object with a <a href="#registration-field-format">Registration Field</a> as that key’s value. If all <code class="language-plaintext highlighter-rouge">registration_requirements</code> lists are empty, this reference object is an empty object (<code class="language-plaintext highlighter-rouge">{}</code>).</li>
 </ul>
 
-<p>Other values in specifications for the Authorization Server Metadata specification or other extensions MAY be included as described in their respective specifications.</p>
+<p>Other values not mentioned here but listed in specifications for the Authorization Server Metadata specification or other extensions MAY be included as described in their respective specifications.</p>
 
 <h3 id="33-scope-descriptions-object-format-">3.3. Scope Descriptions Object Format <a id="scope-descriptions-format" href="#scope-descriptions-format" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>Scope Description objects are formatted as JSON objects and contain named values. The following values are included in the default list available in scope description objects.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">id</code> - <em>string</em> - (REQUIRED) The unique identifier of the scope. This MUST be the same value as the object key the Metadata Object’s <code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> object.</li>
+  <li><code class="language-plaintext highlighter-rouge">name</code> - <em>string</em> - (REQUIRED) A human-readable name of the scope.</li>
+  <li><code class="language-plaintext highlighter-rouge">description</code> - <em>string</em> - (REQUIRED) A human-readable description of what access or actions the scope will enable.</li>
+  <li><code class="language-plaintext highlighter-rouge">documentation</code> - <em>URL</em> - (REQUIRED) Where developers can find documentation for the scope.</li>
+  <li><code class="language-plaintext highlighter-rouge">registration_requirements</code> - <em>Array[string]</em> - (REQUIRED) A list of any registration fields that MUST be submitted with <a href="#registration-request">Client Registration Requests</a> or requirements that must be completed after registration before the scope is available to use in the Server’s production environment. All values in this array MUST be included in the Metadata Object’s <code class="language-plaintext highlighter-rouge">cds_registration_fields</code> object for a complete description of the requirement. If no additional requirements are needed, this value is an empty array (<code class="language-plaintext highlighter-rouge">[]</code>).</li>
+  <li><code class="language-plaintext highlighter-rouge">registration_optional</code> - <em>Array[string]</em> - (REQUIRED) A list of any registration fields that Clients MAY submit with the <a href="#registration-request">Client Registration Requests</a>. If no additional fields are available, this value is an empty array (<code class="language-plaintext highlighter-rouge">[]</code>).</li>
+  <li><code class="language-plaintext highlighter-rouge">response_types_supported</code> - <em>Array[string]</em> - (REQUIRED) The OAuth <code class="language-plaintext highlighter-rouge">response_type</code> values that can be used with this scope. This value follows the same behavior as OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Metadata object <code class="language-plaintext highlighter-rouge">response_types_supported</code></a>, except that this value represents the response types supported for this individual scope and not all scopes for the Client. If a scope is not available for OAuth authorization requests (e.g. a <code class="language-plaintext highlighter-rouge">client_credentials</code>-only scope), this value is an empty array (<code class="language-plaintext highlighter-rouge">[]</code>).</li>
+  <li><code class="language-plaintext highlighter-rouge">grant_types_supported</code> - <em>Array[string]</em> - (REQUIRED) The OAuth grant type values that can be used with this scope. This value follows the same behavior as OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Metadata object <code class="language-plaintext highlighter-rouge">grant_types_supported</code></a>, except that this value represents the grant types supported for this individual scope and not all scopes for the Client. This array MUST contain at least one grant type.</li>
+  <li><code class="language-plaintext highlighter-rouge">token_endpoint_auth_methods_supported</code> - <em>Array[string]</em> - (REQUIRED) The OAuth client authentication methods that can be used for granting tokens with this scope. This value follows the same behavior as OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc8414#section-2">Metadata object <code class="language-plaintext highlighter-rouge">token_endpoint_auth_methods_supported</code></a>, except that this value represents the client authentication methods supported for this individual scope and not all scopes for the Client. A value of <code class="language-plaintext highlighter-rouge">"none"</code> this array indicates that the scope may be used for public application without using a client secret.</li>
+  <li><code class="language-plaintext highlighter-rouge">authorization_details_fields</code> - <em>Array[<a href="#auth-details-fields-format">AuthorizationDetailsField</a>]</em> - (REQUIRED) A list of fields that MAY be included in <a href="https://www.rfc-editor.org/rfc/rfc9396">Rich Authorization Requests</a> the authorization details object for this scope <code class="language-plaintext highlighter-rouge">type</code>. If no extra authorization details fields are available, this value is an empty list (<code class="language-plaintext highlighter-rouge">[]</code>).</li>
+</ul>
 
 <h3 id="34-registration-field-object-format-">3.4. Registration Field Object Format <a id="registration-field-format" href="#registration-field-format" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>Registration Field objects are formatted as JSON objects and contain named values. The following values are included in the default list available in registration fields objects.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">id</code> - <em>string</em> - (REQUIRED) The unique identifier of the registration field. This MUST be the same value as the object key the Metadata Object’s <code class="language-plaintext highlighter-rouge">cds_registration_fields</code> object.</li>
+  <li><code class="language-plaintext highlighter-rouge">type</code> - <em><a href="#registration-field-types">RegistrationFieldType</a></em> - (REQUIRED) What type of Registration Field this entry is.</li>
+  <li><code class="language-plaintext highlighter-rouge">description</code> - <em>string</em> - (REQUIRED) A human-readable description of what should be submitted or expected for this registration field.</li>
+  <li><code class="language-plaintext highlighter-rouge">documentation</code> - <em>URL</em> - (REQUIRED) Where developers can find more information about this registration field.</li>
+  <li><code class="language-plaintext highlighter-rouge">field_name</code> - <em>string</em> - (OPTIONAL) If type is <code class="language-plaintext highlighter-rouge">registration_field</code>, this is the name of the field to submit in the <a href="#registration-request">Client Registration Request</a> and MUST start with <code class="language-plaintext highlighter-rouge">cds_</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">format</code> - <em><a href="#registration-field-formats">RegistrationFieldFormats</a></em> - (OPTIONAL) If type is <code class="language-plaintext highlighter-rouge">registration_field</code>, this is the data format that MUST be used in the value of the field.</li>
+  <li><code class="language-plaintext highlighter-rouge">default</code> - <em>various</em> - (OPTIONAL) If type is <code class="language-plaintext highlighter-rouge">registration_field</code> and the field is optional, this is the default value that will be used in lieu of the Client submitting a value themselves. Including this <code class="language-plaintext highlighter-rouge">default</code> value in the object indicates the registration field is optional.</li>
+  <li><code class="language-plaintext highlighter-rouge">max_length</code> - <em>integer</em> - (OPTIONAL) If format is one of <code class="language-plaintext highlighter-rouge">string</code>, <code class="language-plaintext highlighter-rouge">string_or_null</code>, <code class="language-plaintext highlighter-rouge">url</code>, <code class="language-plaintext highlighter-rouge">url_or_null</code>, <code class="language-plaintext highlighter-rouge">email</code>, or <code class="language-plaintext highlighter-rouge">email_or_null</code>, this is the maximum length of the submitted value, if not <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">max_size</code> - <em>integer</em> - (OPTIONAL) If format is one of <code class="language-plaintext highlighter-rouge">image</code>, <code class="language-plaintext highlighter-rouge">image_or_null</code>, <code class="language-plaintext highlighter-rouge">pdf</code>, or <code class="language-plaintext highlighter-rouge">pdf_or_null</code>, this is the maximum file size of the submitted value before encoding into <a href="https://en.wikipedia.org/wiki/Base64">Base64</a>, if not <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">amount</code> - <em>decimal</em> - (OPTIONAL) If type is <code class="language-plaintext highlighter-rouge">payment_required</code>, this is the amount in <code class="language-plaintext highlighter-rouge">currency</code> that will be required to complete registration.</li>
+  <li><code class="language-plaintext highlighter-rouge">currency</code> - <em>string</em> - (OPTIONAL) If type is <code class="language-plaintext highlighter-rouge">payment_required</code>, this is the monetary currency in <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> currency code.</li>
+</ul>
 
 <h3 id="35-registration-field-types-">3.5. Registration Field Types <a id="registration-field-types" href="#registration-field-types" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>Registration Field types define which type of action the Client or Server will take for that registration field. Registration Fields can be either something that MUST or MAY be submitted as part of the <a href="#registration-request">Client Registration Request</a>, depending on the submitted scope’s <code class="language-plaintext highlighter-rouge">registration_requirements</code> and <code class="language-plaintext highlighter-rouge">registration_optional</code> values, or can be something that a Client must do after registration in order to be full approved for use in the production environment.</p>
 
-<h3 id="36-authorization-details-field-object-format-">3.6. Authorization Details Field Object Format <a id="auth-details-fields-format" href="#auth-details-fields-format" class="permalink">🔗</a></h3>
+<p>The following list of strings are an enumerated set of registration field types that are valid <code class="language-plaintext highlighter-rouge">type</code> values in the registration field object.</p>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">registration_field</code> - This field should be submitting with the <a href="#registration-request">Client Registration Request</a> as the <code class="language-plaintext highlighter-rouge">field_name</code>. This type of registration field MUST also have <code class="language-plaintext highlighter-rouge">field_name</code> and <code class="language-plaintext highlighter-rouge">format</code> values. If this field is optional as part of registration, <code class="language-plaintext highlighter-rouge">default</code> must also be defined in the registration field object.</li>
+  <li><code class="language-plaintext highlighter-rouge">manual_review</code> - This field indicates that the Server will manually review the registration before approving it for production use. Notifications and communication about the status of this manual review will be conveyed using the <a href="#client-updates-api">Client Updates API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">payment_required</code> - This field indicates that a setup payment will be required before the Server will approve the Client for production use. Notifications and communication about how to pay and confirmation of payment will be conveyed using the <a href="#client-updates-api">Client Updates API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">email_verification</code> - This field indicates that the Client must verify their email before the Server will approve the Client for production use. Notifications and communication about how to verify the Client’s contact email will be conveyed using the <a href="#client-updates-api">Client Updates API</a>.</li>
+</ul>
 
-<h3 id="37-authorization-details-field-types-">3.7. Authorization Details Field Types <a id="auth-details-field-types" href="#auth-details-field-types" class="permalink">🔗</a></h3>
+<h3 id="36-registration-field-formats-">3.6. Registration Field Formats <a id="registration-field-formats" href="#registration-field-formats" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>Registration Field formats define the data type of submitted values for these fields in <a href="#registration-request">Client Registration Requests</a>.</p>
+
+<p>The following list of strings are an enumerated set of registration field formats that are valid <code class="language-plaintext highlighter-rouge">format</code> values in the registration field object.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">string</code> - If required, a string value MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">string_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">string</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+  <li><code class="language-plaintext highlighter-rouge">url</code> - If required, a URL value MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">url_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">url</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+  <li><code class="language-plaintext highlighter-rouge">email</code> - If required, a valid email address string MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">email_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">email</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+  <li><code class="language-plaintext highlighter-rouge">boolean</code> - If required, either <code class="language-plaintext highlighter-rouge">true</code> or <code class="language-plaintext highlighter-rouge">false</code> MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">boolean_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">boolean</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+  <li><code class="language-plaintext highlighter-rouge">image</code> - If required, a valid image file formatted as <code class="language-plaintext highlighter-rouge">image/jpeg</code> or <code class="language-plaintext highlighter-rouge">image/png</code> encoded as a string using <a href="https://en.wikipedia.org/wiki/Base64">Base64</a> MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">image_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">image</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+  <li><code class="language-plaintext highlighter-rouge">pdf</code> - If required, a valid pdf file formatted encoded using <a href="https://en.wikipedia.org/wiki/Base64">Base64</a> as a string MUST be submitted.</li>
+  <li><code class="language-plaintext highlighter-rouge">pdf_or_null</code> - Same as <code class="language-plaintext highlighter-rouge">pdf</code>, only with <code class="language-plaintext highlighter-rouge">null</code> being an additional possible value.</li>
+</ul>
+
+<h3 id="37-authorization-details-field-object-format-">3.7. Authorization Details Field Object Format <a id="auth-details-fields-format" href="#auth-details-fields-format" class="permalink">🔗</a></h3>
+
+<p>Authorization Details Field objects are formatted as JSON objects and contain named values. The following values are included in the default list available in authorization details field objects.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">id</code> - <em>string</em> - (REQUIRED) The unique identifier of the authorization details field. This value is used as the key for the field when added to <code class="language-plaintext highlighter-rouge">authorization_details</code> data fields as part of OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9396">Rich Authorization Requests</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">name</code> - <em>string</em> - (REQUIRED) A human-readable name of the authorization details field.</li>
+  <li><code class="language-plaintext highlighter-rouge">description</code> - <em>string</em> - (REQUIRED) A human-readable description of what submitting values for this authorization details field means.</li>
+  <li><code class="language-plaintext highlighter-rouge">documentation</code> - <em>URL</em> - (REQUIRED) Where developers can find more information about this authorization details field.</li>
+  <li><code class="language-plaintext highlighter-rouge">format</code> - <em><a href="#auth-details-field-formats">AuthorizationDetailsFieldFormats</a></em> - (OPTIONAL) The data format that MUST be used in the value of the field when including it as a data field in <code class="language-plaintext highlighter-rouge">authorization_details</code> objects.</li>
+  <li><code class="language-plaintext highlighter-rouge">default</code> - <em>various</em> - (REQUIRED) The default value that will be used in lieu of the Client submitting a value themselves. This is also the value that will be used if a basic OAuth <code class="language-plaintext highlighter-rouge">scope</code> string parameter is used instead of an <code class="language-plaintext highlighter-rouge">authorization_details</code> parameter.</li>
+  <li><code class="language-plaintext highlighter-rouge">relative_date_limit</code> - <em>integer</em> - (OPTIONAL) If <code class="language-plaintext highlighter-rouge">format</code> is <code class="language-plaintext highlighter-rouge">relative_or_absolute_date</code>, this is the largest relative date range that may be submitted. Servers MUST validate both submitted absolute dates and relative dates against the relative date limit, where when comparing to a submitted absolute date, the current Server date in the Server’s local timezone is used as the relative point of reference.</li>
+  <li><code class="language-plaintext highlighter-rouge">absolute_date_limit</code> - <em>integer</em> - (OPTIONAL) If <code class="language-plaintext highlighter-rouge">format</code> is <code class="language-plaintext highlighter-rouge">relative_or_absolute_date</code>, this is the furthest away date that may be submitted. Servers MUST validate both submitted absolute dates and relative dates against the absolute date limit, where when comparing to a submitted relative date, the current Server date in the Server’s local timezone is used as the relative point of reference.</li>
+  <li><code class="language-plaintext highlighter-rouge">limit</code> - <em>integer</em> - (OPTIONAL) If format is one of <code class="language-plaintext highlighter-rouge">int</code> or <code class="language-plaintext highlighter-rouge">decimal</code>, this is the largest value that can be the submitted.</li>
+</ul>
+
+<h3 id="38-authorization-details-field-formats-">3.8. Authorization Details Field Formats <a id="auth-details-field-formats" href="#auth-details-field-formats" class="permalink">🔗</a></h3>
+
+<p>Authorization Details Field formats define the data type of submitted values for these fields in <code class="language-plaintext highlighter-rouge">authorization_details</code> for OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc9396">Rich Authorization Requests</a>.</p>
+
+<p>The following list of strings are an enumerated set of authorization details field formats that are valid <code class="language-plaintext highlighter-rouge">format</code> values in the <a href="#auth-details-fields-format">Authorization Details Field objects</a>.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">relative_or_absolute_date</code> - A relative or absolute date string. Relative dates are formatted as a positive integer followed by a <code class="language-plaintext highlighter-rouge">y</code>, <code class="language-plaintext highlighter-rouge">m</code>, <code class="language-plaintext highlighter-rouge">w</code>, or <code class="language-plaintext highlighter-rouge">d</code> character, where the character represents the unit of duration (year, month, week, and day), and the integer represents the number of units for that duration. For example, <code class="language-plaintext highlighter-rouge">3y</code> represents a relative date range of 3 years. Absolute dates are formatted as ISO8601 dates (<code class="language-plaintext highlighter-rouge">YYYY-MM-DD</code>). For example, <code class="language-plaintext highlighter-rouge">2024-01-02</code> represents the 2nd of January, 2024. Dates are defined as the date from the perspective of the Server’s local timezone.</li>
+  <li><code class="language-plaintext highlighter-rouge">int</code> - An integer value.</li>
+  <li><code class="language-plaintext highlighter-rouge">decimal</code> - A decimal value, which can have any number of significant units, but MUST NOT be stored or handled as a float value, in order to retain the precision of the value throughout Server and Client processing.</li>
+</ul>
 
 <h2 id="4-client-registration-process-">4. Client Registration Process <a id="client-registration-process" href="#client-registration-process" class="permalink">🔗</a></h2>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591">Dynamic Client Registration</a> is used as the basis for initially registering Clients with Servers. To perform the dynamic registration process, the Client submits a request to the Server’s <code class="language-plaintext highlighter-rouge">registration_endpoint</code> provided in the Server’s <a href="#auth-server-metadata-format">Metadata object</a> as described in <a href="#registration-request">Client Registration Request</a>. The Server then responds with either an error or a generated Client registration response as described in <a href="#registration-response">Client Registration Response</a>.</p>
 
 <h3 id="41-client-registration-request-">4.1. Client Registration Request <a id="registration-request" href="#registration-request" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>This specification requires Clients and Servers follow the process described in OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591#section-3.1">Client Registration Request</a>, with the following modifications.</p>
+
+<ul>
+  <li>Clients MAY submit additional named values that are defined as part of scope <code class="language-plaintext highlighter-rouge">registration_requirements</code> and <code class="language-plaintext highlighter-rouge">registration_optional</code> arrays in <code class="language-plaintext highlighter-rouge">cds_scope_descriptions</code> objects, using the registration field reference’s <code class="language-plaintext highlighter-rouge">field_name</code> value as the submitted key in the registration request.</li>
+</ul>
 
 <h3 id="42-client-registration-response-">4.2. Client Registration Response <a id="registration-response" href="#registration-response" class="permalink">🔗</a></h3>
 
-<p><span style="background-color:yellow">TODO</span></p>
+<p>This specification requires Servers follow the process described in OAuth’s <a href="https://www.rfc-editor.org/rfc/rfc7591#section-3.2">Client Registration Response</a>, with the following modifications.</p>
+
+<ul>
+  <li>A <code class="language-plaintext highlighter-rouge">client_secret</code> value MUST be present in the response and be limited to <code class="language-plaintext highlighter-rouge">client_admin</code> scope use only.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">scope</code> value MUST include the <code class="language-plaintext highlighter-rouge">client_admin</code> scope.</li>
+</ul>
+
+<p>Additionally, the following additional named values MUST be included in the response.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cds_server_metadata</code> - <em>URL</em> - (REQUIRED) Where the Client can find their registration-specific version of the <a href="/specs/cdsc-wg1-01/">CDSC-WG1-01 Server Metadata</a>. If the Client’s CDSC server metadata is no different from the public CDSC server metadata, Servers MAY simply link to the public URL. If this metadata endpoint requires authentication, Servers MUST authenticate Client requests to this endpoint via Bearer access token obtained using OAuth’s <code class="language-plaintext highlighter-rouge">client_credentials</code> grant with a scope of <code class="language-plaintext highlighter-rouge">client_admin</code>, and reject unauthenticated requests with a <code class="language-plaintext highlighter-rouge">401 Unauthorized</code> response code. Clients know that they must use a Bearer token when Servers return a <code class="language-plaintext highlighter-rouge">401</code> response code for this endpoint when the Client makes an unauthenticated request to the endpoint.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_clients_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#clients-api">Clients API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_client_settings_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#client-settings-api">Client Settings API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_client_updates_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#client-updates-api">Client Updates API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_scope_credentials_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#scope-creds-api">Scope Credentials API</a>.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_grants_api</code> - <em>URL</em> - (REQUIRED) The base url for the <a href="#grants-api">Grants API</a>.</li>
+</ul>
 
 <h2 id="5-clients-api-">5. Clients API <a id="clients-api" href="#clients-api" class="permalink">🔗</a></h2>
 
