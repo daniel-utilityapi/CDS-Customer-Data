@@ -207,12 +207,18 @@
       <li><a href="#usage-segment-list">11.2. Listing Usage Segments</a></li>
     </ul>
   </li>
-  <li><a href="#extensions">12. Extensions</a></li>
-  <li><a href="#examples">13. Examples</a></li>
-  <li><a href="#security">14. Security Considerations</a></li>
-  <li><a href="#references">15. References</a></li>
-  <li><a href="#acknowledgments">16. Acknowledgments</a></li>
-  <li><a href="#authors-addresses">17. Authors’ Addresses</a></li>
+  <li><a href="#eac-api">12. Energy Attribute Certificates API</a>
+    <ul>
+      <li><a href="#eac-format">12.1. Energy Attribute Certificate Object Format</a></li>
+      <li><a href="#eac-list">12.2. Listing Energy Attribute Certificates</a></li>
+    </ul>
+  </li>
+  <li><a href="#extensions">13. Extensions</a></li>
+  <li><a href="#examples">14. Examples</a></li>
+  <li><a href="#security">15. Security Considerations</a></li>
+  <li><a href="#references">16. References</a></li>
+  <li><a href="#acknowledgments">17. Acknowledgments</a></li>
+  <li><a href="#authors-addresses">18. Authors’ Addresses</a></li>
 </ul>
 
 <h2 id="1-introduction-">1. Introduction <a id="introduction" href="#introduction" class="permalink">🔗</a></h2>
@@ -703,27 +709,81 @@
 
 <p>Listings of Usage Segments MUST be ordered in alphanumeric order by <code class="language-plaintext highlighter-rouge">aggregation_number</code>. In situations where relevant Usage Segments have the same <code class="language-plaintext highlighter-rouge">aggregation_number</code>, those Usage Segments with the same <code class="language-plaintext highlighter-rouge">aggregation_number</code> are further ordered in alphanumeric order by <code class="language-plaintext highlighter-rouge">account_number</code>. In situations where relevant Usage Segments have the same <code class="language-plaintext highlighter-rouge">account_number</code>, those Usage Segments with the same <code class="language-plaintext highlighter-rouge">account_number</code> are further ordered in alphanumeric order by <code class="language-plaintext highlighter-rouge">contract_number</code>. In situations where relevant Usage Segments have the same <code class="language-plaintext highlighter-rouge">contract_number</code>, those Usage Segments with the same <code class="language-plaintext highlighter-rouge">contract_number</code> are further ordered in chronological order by <code class="language-plaintext highlighter-rouge">segment_start</code>, where the relevant Usage Segment object with the earliest date is listed first. In situations where relevant Usage Segments have the same <code class="language-plaintext highlighter-rouge">segment_start</code>, those Usage Segments with the same <code class="language-plaintext highlighter-rouge">segment_start</code> are further ordered in reverse chronological order by <code class="language-plaintext highlighter-rouge">cds_modified</code>, where the most recently updated relevant Usage Segment object is listed first.</p>
 
-<h2 id="12-extensions-">12. Extensions <a id="extensions" href="#extensions" class="permalink">🔗</a></h2>
+<h2 id="12-energy-attribute-certificates-api-">12. Energy Attribute Certificates API <a id="eac-api" href="#eac-api" class="permalink">🔗</a></h2>
+
+<p>This specification requires Servers provide a set of APIs allowing Clients to retrieve a Customer’s and Server’s Energy Attribute Certificate (EAC) objects for which they are authorized to access. These APIs are authenticated using a Bearer <code class="language-plaintext highlighter-rouge">access_token</code> <a href="/specs/cdsc-wg1-02#grants-api">granted</a> that provisions access for a <a href="#authorization-scopes">scope</a> that allows access to the Energy Attribute Certificates API.</p>
+
+<h3 id="121-energy-attribute-certificate-object-format-">12.1. Energy Attribute Certificate Object Format <a id="eac-format" href="#eac-format" class="permalink">🔗</a></h3>
+
+<p>EAC objects are formatted as JSON objects and contain the following named values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cds_eac_id</code> - <em>string</em> - (REQUIRED) The Server’s unique identifier for this EAC object.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_created</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server created this EAC object.</li>
+  <li><code class="language-plaintext highlighter-rouge">cds_modified</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server last modified this EAC object.</li>
+  <li><code class="language-plaintext highlighter-rouge">eac_number</code> - <em>string or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) The EAC identifier that a Client or Customer sees in Server documentation, Customer documents, or other interfaces as the identifier for this EAC, if available. If a Server does not have a Client or Customer-facing EAC identifier and the Client is not authorized to see the Server’s internal EAC identifier for this EAC, or the Server does not have identifiers stored for this EAC, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">source_id</code> - <em>string</em> - (REQUIRED) The EAC’s source identifier. The EAC source is defined as the organization who owns issuance of the EAC.</li>
+  <li><code class="language-plaintext highlighter-rouge">source_name</code> - <em>string</em> - (REQUIRED) The EAC source’s organization name.</li>
+  <li><code class="language-plaintext highlighter-rouge">destination_id</code> - <em>string</em> - (REQUIRED) The EAC’s destination identifier. The EAC destination is defined as the organization responsible for retirement of the EAC.</li>
+  <li><code class="language-plaintext highlighter-rouge">destination_name</code> - <em>string</em> - (REQUIRED) The EAC destination’s organization name.</li>
+  <li><code class="language-plaintext highlighter-rouge">beneficiary_id</code> - <em>string</em> - (REQUIRED) The Customer identifier or program name to allocate pro-rata to customers in the program.</li>
+  <li><code class="language-plaintext highlighter-rouge">program_type</code> - <em><a href="#program-types">ProgramType</a></em> - (REQUIRED) The type of program to which this EAC is applied.</li>
+  <li><code class="language-plaintext highlighter-rouge">asset_id</code> - <em>string</em> - (REQUIRED) The generation asset’s identifier.</li>
+  <li><code class="language-plaintext highlighter-rouge">asset_origination</code> - <em><a href="#eac-asset-location-types">AssetLocationType</a></em> - (REQUIRED) From where the asset’s generation is originated.</li>
+  <li><code class="language-plaintext highlighter-rouge">asset_destination</code> - <em><a href="#eac-asset-location-types">AssetLocationType</a></em> - (REQUIRED) To where the asset’s generation is destined.</li>
+  <li><code class="language-plaintext highlighter-rouge">technology_type</code> - <em><a href="#eac-technology-types">TechnologyType</a></em> - (REQUIRED) The type of technology used for generating the EAC.</li>
+  <li><code class="language-plaintext highlighter-rouge">emissions_factor_direct</code> - <em>decimal</em> - (REQUIRED) <span style="background-color:yellow">TODO:definition</span>.</li>
+  <li><code class="language-plaintext highlighter-rouge">emissions_factor_lca</code> - <em>decimal</em> - (REQUIRED) <span style="background-color:yellow">TODO:definition</span>.</li>
+  <li><code class="language-plaintext highlighter-rouge">issuance_date</code> - <em>ISO8601 date</em> - (REQUIRED) What day the EAC was issued.</li>
+  <li><code class="language-plaintext highlighter-rouge">retirement_date</code> - <em>ISO8601 date or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) What day the EAC was retired. If the EAC has not yet been retired, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">period_start</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC period started.</li>
+  <li><code class="language-plaintext highlighter-rouge">period_end</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC period ended or will end.</li>
+  <li><code class="language-plaintext highlighter-rouge">value</code> - <em>decimal</em> - (REQUIRED) The quantity of the EAC.</li>
+  <li><code class="language-plaintext highlighter-rouge">unit</code> - <em><a href="#unit-types">Unit</a></em> - (REQUIRED) The unit of the EAC’s quantity.</li>
+</ul>
+
+<h3 id="122-listing-energy-attribute-certificates-">12.2. Listing Energy Attribute Certificates <a id="eac-list" href="#eac-list" class="permalink">🔗</a></h3>
+
+<p>Clients may request to list EAC objects that they have access to by making an HTTPS <code class="language-plaintext highlighter-rouge">GET</code> request, authenticated with a valid Bearer <code class="language-plaintext highlighter-rouge">access_token</code> that is scoped to provide access to a set of EACs, to the <code class="language-plaintext highlighter-rouge">cds_eacs_api</code> URL included in the <a href="/specs/cdsc-wg1-02/#registration-response">Client Registration Response</a> or <a href="/specs/cdsc-wg1-02/#client-format">Clients API</a>. The EAC object listing request responses are formatted as JSON objects and contain the following named values.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">eacs</code> - <em>Array[<a href="#eac-format">EnergyAttributeCredit</a>]</em> - (REQUIRED) A list of EACs to which the requesting <code class="language-plaintext highlighter-rouge">access_token</code> is scoped to have access. If no EACs are accessible, this value is an empty list (<code class="language-plaintext highlighter-rouge">[]</code>). If more than 100 EACs are available to be listed, Servers MAY truncate the list and use the <code class="language-plaintext highlighter-rouge">next</code> value to link to the next segment of the list of EACs.</li>
+  <li><code class="language-plaintext highlighter-rouge">next</code> - <em>URL</em> or <code class="language-plaintext highlighter-rouge">null</code> - Where to request the next segment of the list of EACs. If no next segment exists (i.e. the requester is at the end of the list), this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">previous</code> - <em>URL</em> or <code class="language-plaintext highlighter-rouge">null</code> - Where to request the previous segment of the list of EACs. If no previous segment exists (i.e. the requester is at the front of the list), this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+</ul>
+
+<p>Servers MUST support Clients adding any of the following URL parameters to the <code class="language-plaintext highlighter-rouge">GET</code> request, which will filter the list of EACs to be the intersection of results for each of the URL parameters filters:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cds_eac_ids</code> - A space-separated list of <code class="language-plaintext highlighter-rouge">cds_eac_id</code> values for which the Servers MUST filter the EACs.</li>
+  <li><code class="language-plaintext highlighter-rouge">eac_numbers</code> - A space-separated list of <code class="language-plaintext highlighter-rouge">eac_number</code> values for which the Servers MUST filter the EACs.</li>
+  <li><code class="language-plaintext highlighter-rouge">before</code> - An ISO8601 datetime for which the Server MUST filter the EAC object <code class="language-plaintext highlighter-rouge">issuance_date</code> to values that are on or before this date.</li>
+  <li><code class="language-plaintext highlighter-rouge">after</code> - An ISO8601 datetime for which the Server MUST filter the EAC object <code class="language-plaintext highlighter-rouge">issuance_date</code> to values that are on or after this date.</li>
+</ul>
+
+<p>Listings of EACs MUST be ordered in alphanumeric order by <code class="language-plaintext highlighter-rouge">eac_number</code>. In situations where relevant EACs have the same <code class="language-plaintext highlighter-rouge">eac_number</code>, those EACs with the same <code class="language-plaintext highlighter-rouge">eac_number</code> are further ordered in reverse chronological order by <code class="language-plaintext highlighter-rouge">issuance_date</code>, where the most recently issued EAC is first.</p>
+
+<h2 id="13-extensions-">13. Extensions <a id="extensions" href="#extensions" class="permalink">🔗</a></h2>
 
 <p><span style="background-color:yellow">TODO</span></p>
 
-<h2 id="13-examples-">13. Examples <a id="examples" href="#examples" class="permalink">🔗</a></h2>
+<h2 id="14-examples-">14. Examples <a id="examples" href="#examples" class="permalink">🔗</a></h2>
 
 <p><span style="background-color:yellow">TODO</span></p>
 
-<h2 id="14-security-considerations-">14. Security Considerations <a id="security" href="#security" class="permalink">🔗</a></h2>
+<h2 id="15-security-considerations-">15. Security Considerations <a id="security" href="#security" class="permalink">🔗</a></h2>
 
 <p><span style="background-color:yellow">TODO</span></p>
 
-<h2 id="15-references-">15. References <a id="references" href="#references" class="permalink">🔗</a></h2>
+<h2 id="16-references-">16. References <a id="references" href="#references" class="permalink">🔗</a></h2>
 
 <p><span style="background-color:yellow">TODO</span></p>
 
-<h2 id="16-acknowledgments-">16. Acknowledgments <a id="acknowledgments" href="#acknowledgments" class="permalink">🔗</a></h2>
+<h2 id="17-acknowledgments-">17. Acknowledgments <a id="acknowledgments" href="#acknowledgments" class="permalink">🔗</a></h2>
 
 <p>The authors would like to thank the late Shuli Goodman, who was the Executive Director of LFEnergy, for her incredible leadership in initially organizing the Carbon Data Specification.</p>
 
-<h2 id="17-authors-addresses-">17. Authors’ Addresses <a id="authors-addresses" href="#authors-addresses" class="permalink">🔗</a></h2>
+<h2 id="18-authors-addresses-">18. Authors’ Addresses <a id="authors-addresses" href="#authors-addresses" class="permalink">🔗</a></h2>
 
 <p>Daniel Roesler<br />
 UtilityAPI<br />
