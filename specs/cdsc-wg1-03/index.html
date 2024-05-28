@@ -667,18 +667,20 @@
   <li><code class="language-plaintext highlighter-rouge">cds_usagesegment_id</code> - <em>string</em> - (REQUIRED) The Server’s unique identifier for this Usage Segment object.</li>
   <li><code class="language-plaintext highlighter-rouge">cds_created</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server created this Usage Segment object.</li>
   <li><code class="language-plaintext highlighter-rouge">cds_modified</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server last modified this Usage Segment object.</li>
-  <li><code class="language-plaintext highlighter-rouge">cds_aggregation_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_account_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_servicecontract_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_servicepoint_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_meterdevice_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">cds_billsection_ids</code></li>
-  <li><code class="language-plaintext highlighter-rouge">segment_start</code></li>
-  <li><code class="language-plaintext highlighter-rouge">segment_end</code></li>
-  <li><code class="language-plaintext highlighter-rouge">interval</code></li>
-  <li><code class="language-plaintext highlighter-rouge">format</code></li>
-  <li><code class="language-plaintext highlighter-rouge">values</code></li>
+  <li><code class="language-plaintext highlighter-rouge">related_aggregations</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_aggregation_id</code>]</em> - (REQUIRED) The list of Aggregation unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">related_accounts</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_account_id</code>]</em> - (REQUIRED) The list of Account unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">related_servicecontracts</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_servicecontract_id</code>]</em> - (REQUIRED) The list of Service Contract unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">related_servicepoints</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_servicepoint_id</code>]</em> - (REQUIRED) The list of Service Point unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">related_meterdevices</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_meterdevice_id</code>]</em> - (REQUIRED) The list of Meter Device unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">related_billsections</code> - <em>Array[<code class="language-plaintext highlighter-rouge">cds_billsection_id</code>]</em> - (REQUIRED) The list of Bill Section unique identifiers to which this Usage Segment is applicable.</li>
+  <li><code class="language-plaintext highlighter-rouge">segment_start</code> - <em>ISO8601 datetime</em> - (REQUIRED) The starting timestamp for the list of Usage Segment <code class="language-plaintext highlighter-rouge">values</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">segment_end</code> - <em>ISO8601 datetime</em> - (REQUIRED) The ending timestamp for the list of Usage Segment <code class="language-plaintext highlighter-rouge">values</code>. For values that represent a duration (e.g. 15-min usage interval reading), the <code class="language-plaintext highlighter-rouge">segment_end</code> MUST represent the timestamp at the end of the duration.</li>
+  <li><code class="language-plaintext highlighter-rouge">interval</code> - <em>decimal</em> - (REQUIRED) How long between values, in seconds. For values representing a duration interval (e.g. kwh usage intervals), this <code class="language-plaintext highlighter-rouge">interval</code> represents the duration of each interval, where the next value starts immediately at the end of the prior interval value with no time gap. For values representing instantaneous readings (e.g. register read), this <code class="language-plaintext highlighter-rouge">interval</code> represents the time between the readings provided in the <code class="language-plaintext highlighter-rouge">values</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">format</code> - <em>Array[<a href="#usage-segment-value-format">ValueFormat</a>]</em> - (REQUIRED) For each entry in <code class="language-plaintext highlighter-rouge">values</code>, these are the formats of that are included, presented in the order in which the values are presented.</li>
+  <li><code class="language-plaintext highlighter-rouge">values</code> - <em>Array[<a href="#usage-segment-value-set-format">ValueSet</a>]</em> - (REQUIRED) A list of Value Sets that represent the entries included in the Usage Segment.</li>
 </ul>
+
+<p>Servers MUST only inlude unique identifiers in <code class="language-plaintext highlighter-rouge">related_aggregations</code>, <code class="language-plaintext highlighter-rouge">related_accounts</code>, <code class="language-plaintext highlighter-rouge">related_servicecontracts</code>, <code class="language-plaintext highlighter-rouge">related_servicepoints</code>, <code class="language-plaintext highlighter-rouge">related_meterdevices</code>, and <code class="language-plaintext highlighter-rouge">related_billsections</code> lists MUST only include identifiers that the Client is authorized to see as scoped by their requesting <code class="language-plaintext highlighter-rouge">access_token</code>.</p>
 
 <h3 id="112-listing-usage-segments-">11.2. Listing Usage Segments <a id="usage-segment-list" href="#usage-segment-list" class="permalink">🔗</a></h3>
 
