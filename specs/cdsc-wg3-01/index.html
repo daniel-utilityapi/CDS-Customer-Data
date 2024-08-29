@@ -210,7 +210,11 @@
   <li><a href="#eac-api">12. Energy Attribute Certificates API</a>
     <ul>
       <li><a href="#eac-format">12.1. Energy Attribute Certificate Object Format</a></li>
-      <li><a href="#eac-list">12.2. Listing Energy Attribute Certificates</a></li>
+      <li><a href="#eac-beneficiary-types">12.2. Beneficiary Types</a></li>
+      <li><a href="#eac-asset-location-types">12.3. Asset Location Types</a></li>
+      <li><a href="#eac-technology-types">12.4. Technology Types</a></li>
+      <li><a href="#eac-values">12.5. EAC Values</a></li>
+      <li><a href="#eac-list">12.6. Listing Energy Attribute Certificates</a></li>
     </ul>
   </li>
   <li><a href="#extensions">13. Extensions</a></li>
@@ -310,6 +314,7 @@
   <li><code class="language-plaintext highlighter-rouge">cds_created</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server created this Account object.</li>
   <li><code class="language-plaintext highlighter-rouge">cds_modified</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the Server last modified this Account object.</li>
   <li><code class="language-plaintext highlighter-rouge">cds_account_parent</code> - <em>string or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) The <code class="language-plaintext highlighter-rouge">cds_account_id</code> of a parent Account object of which this Account is grouped under. If the Account is not a part of a parent grouping, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">customer_number</code> - <em>string or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) The identifier that a Customer has access to that identifies a collection of Accounts as being for the same Customer. If a Server only stores Accounts as the top-level identifier for Customers, or does not have a Customer-accessible identifier set for this Account, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
   <li><code class="language-plaintext highlighter-rouge">account_number</code> - <em>string</em> - (REQUIRED) The number that a Customer sees on their bill and online user interface as the identifier for this Account.</li>
   <li><code class="language-plaintext highlighter-rouge">account_name</code> - <em>string</em> - (OPTIONAL) The name that a Customer sees on their bill and online user interface as the name for this Account, if available.</li>
   <li><code class="language-plaintext highlighter-rouge">account_address</code> - <em>multi-line address</em> - (OPTIONAL) The address that a Customer sees on their bill and online user interface as the address for this Account, if available.</li>
@@ -331,10 +336,12 @@
 
 <ul>
   <li><code class="language-plaintext highlighter-rouge">cds_account_ids</code> - A space-separated list of <code class="language-plaintext highlighter-rouge">cds_account_id</code> values for which the Servers MUST filter the Accounts.</li>
+  <li><code class="language-plaintext highlighter-rouge">customer_numbers</code> - A space-separated list of <code class="language-plaintext highlighter-rouge">customer_number</code> values for which the Servers MUST filter the Accounts. Customer number values of <code class="language-plaintext highlighter-rouge">null</code> MUST be treated as invalid for this URL parameter filter (i.e. only populated <code class="language-plaintext highlighter-rouge">customer_number</code> values are available to be filtered using URL parameters).</li>
   <li><code class="language-plaintext highlighter-rouge">account_numbers</code> - A space-separated list of <code class="language-plaintext highlighter-rouge">account_number</code> values for which the Servers MUST filter the Accounts.</li>
   <li><code class="language-plaintext highlighter-rouge">q</code> - A search term for which the Servers MUST filter the Accounts following fields for values that case-insensitive contains the search term, if the field is accessible based on the Client’s <code class="language-plaintext highlighter-rouge">access_token</code> scope.
     <ul>
       <li><code class="language-plaintext highlighter-rouge">cds_account_id</code></li>
+      <li><code class="language-plaintext highlighter-rouge">customer_number</code></li>
       <li><code class="language-plaintext highlighter-rouge">account_number</code></li>
       <li><code class="language-plaintext highlighter-rouge">account_address</code></li>
       <li><code class="language-plaintext highlighter-rouge">account_name</code></li>
@@ -727,24 +734,72 @@
   <li><code class="language-plaintext highlighter-rouge">source_id</code> - <em>string</em> - (REQUIRED) The EAC’s source identifier. The EAC source is defined as the organization who owns issuance of the EAC.</li>
   <li><code class="language-plaintext highlighter-rouge">source_name</code> - <em>string</em> - (REQUIRED) The EAC source’s organization name.</li>
   <li><code class="language-plaintext highlighter-rouge">destination_id</code> - <em>string</em> - (REQUIRED) The EAC’s destination identifier. The EAC destination is defined as the organization responsible for retirement of the EAC.</li>
-  <li><code class="language-plaintext highlighter-rouge">destination_name</code> - <em>string</em> - (REQUIRED) The EAC destination’s organization name.</li>
-  <li><code class="language-plaintext highlighter-rouge">beneficiary_id</code> - <em>string</em> - (REQUIRED) The Customer identifier or program name to allocate pro-rata to customers in the program.</li>
-  <li><code class="language-plaintext highlighter-rouge">program_type</code> - <em><a href="#program-types">ProgramType</a></em> - (REQUIRED) The type of program to which this EAC is applied.</li>
+  <li><code class="language-plaintext highlighter-rouge">destination_name</code> - <em>string</em> - (REQUIRED) The EAC destination’s organization name. For utilities that are operating their own Servers, this value is typically the name of the utility.</li>
+  <li><code class="language-plaintext highlighter-rouge">beneficiary_type</code> - <em><a href="#eac-beneficiary-types">BeneficiaryType</a></em> - (REQUIRED) The type of beneficiary to which this EAC is applied (e.g. an individual customer’s PPA.</li>
+  <li><code class="language-plaintext highlighter-rouge">beneficiaries</code> - <em>Array[string]</em> - (REQUIRED) The list of Customer identifier, rate plan, or program name to allocate the EAC.</li>
   <li><code class="language-plaintext highlighter-rouge">asset_id</code> - <em>string</em> - (REQUIRED) The generation asset’s identifier.</li>
   <li><code class="language-plaintext highlighter-rouge">asset_origination</code> - <em><a href="#eac-asset-location-types">AssetLocationType</a></em> - (REQUIRED) From where the asset’s generation is originated.</li>
   <li><code class="language-plaintext highlighter-rouge">asset_destination</code> - <em><a href="#eac-asset-location-types">AssetLocationType</a></em> - (REQUIRED) To where the asset’s generation is destined.</li>
   <li><code class="language-plaintext highlighter-rouge">technology_type</code> - <em><a href="#eac-technology-types">TechnologyType</a></em> - (REQUIRED) The type of technology used for generating the EAC.</li>
   <li><code class="language-plaintext highlighter-rouge">emissions_factor_direct</code> - <em>decimal</em> - (REQUIRED) <span style="background-color:yellow">TODO:definition</span>.</li>
   <li><code class="language-plaintext highlighter-rouge">emissions_factor_lca</code> - <em>decimal</em> - (REQUIRED) <span style="background-color:yellow">TODO:definition</span>.</li>
-  <li><code class="language-plaintext highlighter-rouge">issuance_date</code> - <em>ISO8601 date</em> - (REQUIRED) What day the EAC was issued.</li>
-  <li><code class="language-plaintext highlighter-rouge">retirement_date</code> - <em>ISO8601 date or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) What day the EAC was retired. If the EAC has not yet been retired, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
   <li><code class="language-plaintext highlighter-rouge">period_start</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC period started.</li>
   <li><code class="language-plaintext highlighter-rouge">period_end</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC period ended or will end.</li>
-  <li><code class="language-plaintext highlighter-rouge">value</code> - <em>decimal</em> - (REQUIRED) The quantity of the EAC.</li>
-  <li><code class="language-plaintext highlighter-rouge">unit</code> - <em><a href="#unit-types">Unit</a></em> - (REQUIRED) The unit of the EAC’s quantity.</li>
+  <li><code class="language-plaintext highlighter-rouge">values</code> - <em>Array[<a href="#eac-values">EnergyAttributeValues</a>]</em></li>
 </ul>
 
-<h3 id="122-listing-energy-attribute-certificates-">12.2. Listing Energy Attribute Certificates <a id="eac-list" href="#eac-list" class="permalink">🔗</a></h3>
+<h3 id="122-beneficiary-types-">12.2. Beneficiary Types <a id="eac-beneficiary-types" href="#eac-beneficiary-types" class="permalink">🔗</a></h3>
+
+<p>EAC object <code class="language-plaintext highlighter-rouge">beneficiary_type</code> values MUST be one of the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">customer</code> - Within the EAC’s destination, the EAC is further applied to an individual Power Purchase Agreement (PPA) for a set of Customers. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">customer</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST have values of the relevant <code class="language-plaintext highlighter-rouge">customer_number</code> values. NOTE: listed <code class="language-plaintext highlighter-rouge">customer_number</code> values MUST be authorized to be visible to the Client, so while the destination MAY allocate beneficiaries of the EAC to multiple customers, only the customer numbers that are available to be seen as part of the Client’s authorization MUST be listed.</li>
+  <li><code class="language-plaintext highlighter-rouge">account</code> - Within the EAC’s destination, the EAC is further applied to an individual Power Purchase Agreement (PPA) for a set of Customer accounts. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">account</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST have values of the relevant <code class="language-plaintext highlighter-rouge">cds_account_id</code> values. NOTE: listed <code class="language-plaintext highlighter-rouge">cds_account_id</code> values MUST be authorized to be visible to the Client, so while the destination MAY allocate beneficiaries of the EAC to multiple accounts, only the accounts that are available to be seen as part of the Client’s authorization MUST be listed.</li>
+  <li><code class="language-plaintext highlighter-rouge">servicecontract</code> - Within the EAC’s destination, the EAC is further applied to an individual Power Purchase Agreement (PPA) for a set of Customer service contracts. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">servicecontract</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST have values of the relevant <code class="language-plaintext highlighter-rouge">cds_servicecontract_id</code> values. NOTE: listed <code class="language-plaintext highlighter-rouge">cds_servicecontract_id</code> values MUST be authorized to be visible to the Client, so while the destination MAY allocate beneficiaries of the EAC to multiple contracts, only the service contracts that are available to be seen as part of the Client’s authorization MUST be listed.</li>
+  <li><code class="language-plaintext highlighter-rouge">rateplan</code> - Within the EAC’s destination, the EAC is further applied to a rate plan or tariff for the customers with service contracts on that rate plan. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">rateplan</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST have the value of the relevant <code class="language-plaintext highlighter-rouge">rateplan_code</code> values. NOTE: listed <code class="language-plaintext highlighter-rouge">rateplan_code</code> values MUST be authorized to be visible to the Client, so while the destination MAY allocate beneficiaries of the EAC to multiple rate plans or tariffs, only the rate plans that are available to be seen as part of the Client’s authorization MUST be listed.</li>
+  <li><code class="language-plaintext highlighter-rouge">program</code> - Within the EAC’s destination, the EAC is further applied to a special program in which customers are participating. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">program</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST have the value of the relevant <code class="language-plaintext highlighter-rouge">program_id</code> values. NOTE: listed <code class="language-plaintext highlighter-rouge">program_id</code> values MUST be authorized to be visible to the Client, so while the destination MAY allocate beneficiaries of the EAC to multiple special programs, only the rate plans that are available to be seen as part of the Client’s authorization MUST be listed.</li>
+  <li><code class="language-plaintext highlighter-rouge">general</code> - Within the EAC’s destination, the EAC is applied generally to the base energy usage profile for all customers. When the <code class="language-plaintext highlighter-rouge">beneficiary_type</code> is <code class="language-plaintext highlighter-rouge">general</code>, the <code class="language-plaintext highlighter-rouge">beneficiaries</code> MUST be an empty list (<code class="language-plaintext highlighter-rouge">[]</code>).</li>
+</ul>
+
+<h3 id="123-asset-location-types-">12.3. Asset Location Types <a id="eac-asset-location-types" href="#eac-asset-location-types" class="permalink">🔗</a></h3>
+
+<p>EAC object <code class="language-plaintext highlighter-rouge">asset_origination</code> and <code class="language-plaintext highlighter-rouge">asset_destination</code> values MUST be one of the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">grid</code> - The asset is located within the destination’s local distribution grid.</li>
+  <li><code class="language-plaintext highlighter-rouge">region</code> - The asset is located within the destination’s regional transmission operators’ service territory.</li>
+</ul>
+
+<h3 id="124-technology-types-">12.4. Technology Types <a id="eac-technology-types" href="#eac-technology-types" class="permalink">🔗</a></h3>
+
+<p>EAC object <code class="language-plaintext highlighter-rouge">technology_type</code> values MUST be one of the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">solar</code> - The asset’s energy generation is from solar (photovoltaic or thermal).</li>
+  <li><code class="language-plaintext highlighter-rouge">wind</code> - The asset’s energy generation is from wind.</li>
+  <li><code class="language-plaintext highlighter-rouge">hydro</code> - The asset’s energy generation is from hydroelectric.</li>
+  <li><code class="language-plaintext highlighter-rouge">geothermal</code> - The asset’s energy generation is from geothermal.</li>
+  <li><code class="language-plaintext highlighter-rouge">biomass</code> - The asset’s energy generation is from biomass.</li>
+  <li><code class="language-plaintext highlighter-rouge">natural_gas</code> - The asset’s energy generation is from natural gas.</li>
+  <li><code class="language-plaintext highlighter-rouge">coal</code> - The asset’s energy generation is from coal.</li>
+  <li><code class="language-plaintext highlighter-rouge">oil</code> - The asset’s energy generation is from fuel oil.</li>
+</ul>
+
+<h3 id="125-eac-values-">12.5. EAC Values <a id="eac-values" href="#eac-values" class="permalink">🔗</a></h3>
+
+<p>EAC value objects are formatted as JSON objects and contain the following named values:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">eac_number</code> - <em>string or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) The EAC identifier that a Client or Customer sees in Server documentation, Customer documents, or other interfaces as the identifier for this EAC value, if available. If a Server does not have a Client or Customer-facing EAC identifier and the Client is not authorized to see the Server’s internal EAC identifier for this EAC value, or the Server does not have identifiers stored for this EAC value, this value is <code class="language-plaintext highlighter-rouge">null</code>, and the EAC number for this value is assumed to be the value of the parent EAC object’s <code class="language-plaintext highlighter-rouge">eac_number</code> (if any).</li>
+  <li><code class="language-plaintext highlighter-rouge">issued</code> - <em>ISO8601 date</em> - (REQUIRED) What day the EAC value was issued.</li>
+  <li><code class="language-plaintext highlighter-rouge">retired</code> - <em>ISO8601 date or <code class="language-plaintext highlighter-rouge">null</code></em> - (REQUIRED) What day the EAC value was retired. If the EAC has not yet been retired, this value is <code class="language-plaintext highlighter-rouge">null</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">start</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC value period starts.</li>
+  <li><code class="language-plaintext highlighter-rouge">end</code> - <em>ISO8601 datetime</em> - (REQUIRED) When the EAC value period ends.</li>
+  <li><code class="language-plaintext highlighter-rouge">unit</code> - <em><a href="#unit-types">Unit</a></em> - (REQUIRED) The unit of the EAC value’s quantity.</li>
+  <li><code class="language-plaintext highlighter-rouge">value</code> - <em><a href="#unit-types">Unit</a></em> - (REQUIRED) The quantity of the EAC value.</li>
+</ul>
+
+<h3 id="126-listing-energy-attribute-certificates-">12.6. Listing Energy Attribute Certificates <a id="eac-list" href="#eac-list" class="permalink">🔗</a></h3>
 
 <p>Clients may request to list EAC objects that they have access to by making an HTTPS <code class="language-plaintext highlighter-rouge">GET</code> request, authenticated with a valid Bearer <code class="language-plaintext highlighter-rouge">access_token</code> that is scoped to provide access to a set of EACs, to the <code class="language-plaintext highlighter-rouge">cds_eacs_api</code> URL included in the <a href="https://connectivity.carbondataspec.org/specs/cdsc-wg1-02#registration-response">Client Registration Response</a> or <a href="https://connectivity.carbondataspec.org/specs/cdsc-wg1-02#client-format">Clients API</a>. The EAC object listing request responses are formatted as JSON objects and contain the following named values.</p>
 
