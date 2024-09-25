@@ -204,7 +204,10 @@
   <li><a href="#usage-segments-api">11. Usage Segments API</a>
     <ul>
       <li><a href="#usage-segment-format">11.1. Usage Segment Object Format</a></li>
-      <li><a href="#usage-segment-list">11.2. Listing Usage Segments</a></li>
+      <li><a href="#usage-segment-value-format">11.2. Usage Segment Value Formats</a></li>
+      <li><a href="#usage-segment-value-set-format">11.3. Usage Segment Value Set Format</a></li>
+      <li><a href="#usage-segment-value-object-format">11.4. Usage Segment Value Object Format</a></li>
+      <li><a href="#usage-segment-list">11.5. Listing Usage Segments</a></li>
     </ul>
   </li>
   <li><a href="#eac-api">12. Energy Attribute Certificates API</a>
@@ -688,7 +691,43 @@
 
 <p>Servers MUST only inlude unique identifiers in <code class="language-plaintext highlighter-rouge">related_aggregations</code>, <code class="language-plaintext highlighter-rouge">related_accounts</code>, <code class="language-plaintext highlighter-rouge">related_servicecontracts</code>, <code class="language-plaintext highlighter-rouge">related_servicepoints</code>, <code class="language-plaintext highlighter-rouge">related_meterdevices</code>, and <code class="language-plaintext highlighter-rouge">related_billsections</code> lists MUST only include identifiers that the Client is authorized to see as scoped by their requesting <code class="language-plaintext highlighter-rouge">access_token</code>.</p>
 
-<h3 id="112-listing-usage-segments-">11.2. Listing Usage Segments <a id="usage-segment-list" href="#usage-segment-list" class="permalink">🔗</a></h3>
+<h3 id="112-usage-segment-value-formats-">11.2. Usage Segment Value Formats <a id="usage-segment-value-format" href="#usage-segment-value-format" class="permalink">🔗</a></h3>
+
+<p>The Usage Segment <code class="language-plaintext highlighter-rouge">format</code> field provides an ordered list of strings that denote the object types that are included in each Usage Segment <code class="language-plaintext highlighter-rouge">values</code> entry’s <a href="#usage-segment-value-set-format">Value Set</a>. Usage Segments are organized this way so that the <code class="language-plaintext highlighter-rouge">format</code> listing essentially provides a “schema” of object types to expect when parsing the <code class="language-plaintext highlighter-rouge">values</code> Value Sets, which removes the need for each object in each Value Set to include repeated fields, such as an object type value.</p>
+
+<p>The following Usage Segment format strings are specified with their corresponding Value Set object types:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">usage_kwh</code> - <a href="#usage-segment-value-usage-kwh">General Electric Usage in kWh object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">usage_fwd_kwh</code> - <a href="#usage-segment-value-usage-fwd-kwh">Forward Electric Usage in kWh object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">usage_rev_kwh</code> - <a href="#usage-segment-value-usage-rev-kwh">Reverse Electric Usage in kWh object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">usage_net_kwh</code> - <a href="#usage-segment-value-usage-net-kwh">Net Electric Usage in kWh object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">aggregated_kwh</code> - <a href="#usage-segment-value-aggregated-kwh">Aggregated Electric Usage in kWh object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">demand_kw</code> - <a href="#usage-segment-value-demand-kw">Electric Demand in kW object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">water_m3</code> - <a href="#usage-segment-value-water-m3">Water Usage in Cubic Meters object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">water_gal</code> - <a href="#usage-segment-value-water-gal">Water Usage in Gallons object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">water_ft3</code> - <a href="#usage-segment-value-water-ft3">Water Usage in Cubic Feet object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">gas_therm</code> - <a href="#usage-segment-value-gas-therm">Natural Gas Usage in Therms object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">gas_ccf</code> - <a href="#usage-segment-value-gas-ccf">Natural Gas Usage in CCF object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">gas_mcf</code> - <a href="#usage-segment-value-gas-mcf">Natural Gas Usage in MCF object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">gas_mmbtu</code> - <a href="#usage-segment-value-gas-mmbtu">Natural Gas Usage in mmBTU object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">supply_mix</code> - <a href="#usage-segment-value-supply-mix">Electric Supply Mix object</a></li>
+  <li><code class="language-plaintext highlighter-rouge">eacs</code> - <a href="#usage-segment-value-eacs">Energy Attribute Certificates object</a></li>
+</ul>
+
+<p>Value format strings MAY be repeated in the <code class="language-plaintext highlighter-rouge">format</code> listing, indicating there are multiple value objects in the Value Set for that format. This is useful when a Server provides multiple variations of optional fields for the same type of value.</p>
+
+<p>Extensions to this specification MAY further define additional formats other that what is listed above. Client MUST</p>
+
+<h3 id="113-usage-segment-value-set-format-">11.3. Usage Segment Value Set Format <a id="usage-segment-value-set-format" href="#usage-segment-value-set-format" class="permalink">🔗</a></h3>
+
+<p>The Usage Segment <code class="language-plaintext highlighter-rouge">values</code> field provides an ordered list of Value Set entries. A Value Set entry is an array that contains an ordered list of <a href="#usage-segment-value-object-format">Value objects</a>, where the type of each Value object which is defined by the order of the <code class="language-plaintext highlighter-rouge">format</code> listing.</p>
+
+<p>Each Value Set entry in the <code class="language-plaintext highlighter-rouge">values</code> listing represents an increment of <code class="language-plaintext highlighter-rouge">interval</code> seconds in the Usage Segment from the <code class="language-plaintext highlighter-rouge">segment_start</code>. For example, if a Usage Segment has a <code class="language-plaintext highlighter-rouge">segment_start</code> of <code class="language-plaintext highlighter-rouge">2025-01-01T00:00:00Z</code>, an <code class="language-plaintext highlighter-rouge">interval</code> of <code class="language-plaintext highlighter-rouge">900</code>, and four Value Set entries in the <code class="language-plaintext highlighter-rouge">values</code>, the Value Set entries would represent the each 15 minute period of a one hour segment (<code class="language-plaintext highlighter-rouge">2025-01-01T00:00:00Z - 2025-01-01T00:15:00Z</code>, <code class="language-plaintext highlighter-rouge">2025-01-01T00:15:00Z - 2025-01-01T00:30:00Z</code>, <code class="language-plaintext highlighter-rouge">2025-01-01T00:30:00Z - 2025-01-01T00:45:00Z</code>, and <code class="language-plaintext highlighter-rouge">2025-01-01T00:45:00Z - 2025-01-01T01:00:00Z</code>).</p>
+
+<p>If a Value object is not available for a specific Value Set. Servers MUST replace the item in the Value Set with <code class="language-plaintext highlighter-rouge">null</code>.</p>
+
+<h3 id="115-listing-usage-segments-">11.5. Listing Usage Segments <a id="usage-segment-list" href="#usage-segment-list" class="permalink">🔗</a></h3>
 
 <p>Clients may request to list Usage Segment objects that they have access to by making an HTTPS <code class="language-plaintext highlighter-rouge">GET</code> request, authenticated with a valid Bearer <code class="language-plaintext highlighter-rouge">access_token</code> that is scoped to provide access to a set of Usage Segments, to the <code class="language-plaintext highlighter-rouge">cds_usagesegments_api</code> URL included in the <a href="https://connectivity.carbondataspec.org/specs/cdsc-wg1-02#registration-response">Client Registration Response</a> or <a href="https://connectivity.carbondataspec.org/specs/cdsc-wg1-02#client-format">Clients API</a>. The Usage object listing request responses are formatted as JSON objects and contain the following named values.</p>
 
